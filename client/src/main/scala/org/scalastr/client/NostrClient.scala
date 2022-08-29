@@ -1,0 +1,130 @@
+package org.scalastr.client
+
+import akka.actor.ActorSystem
+import akka.http.scaladsl.Http
+import akka.http.scaladsl.model.ws._
+import akka.http.scaladsl.settings._
+import akka.stream.{OverflowStrategy, QueueOfferResult}
+import akka.stream.scaladsl._
+import grizzled.slf4j.Logging
+import org.bitcoins.core.util.StartStopAsync
+import org.bitcoins.tor.{Socks5ClientTransport, Socks5ProxyParams}
+import org.scalastr.core.NostrEvent
+import play.api.libs.json._
+
+import java.net.URI
+import scala.concurrent._
+import scala.util._
+
+abstract class NostrClient(
+    url: String,
+    proxyParamsOpt: Option[Socks5ProxyParams])(implicit val system: ActorSystem)
+    extends StartStopAsync[Unit]
+    with Logging {
+  implicit val ec: ExecutionContext = system.dispatcher
+
+  private val http = Http(system)
+
+  private lazy val (queue, source) = Source
+    .queue[Message](bufferSize = 10,
+                    OverflowStrategy.backpressure,
+                    maxConcurrentOffers = 2)
+    .toMat(BroadcastHub.sink)(Keep.both)
+    .run()
+
+  private var subscriptionQueue: Option[
+    (SourceQueueWithComplete[Message], Promise[Unit])] = None
+
+  private def createHttpConnectionPoolSettings(): ConnectionPoolSettings = {
+    Socks5ClientTransport.createConnectionPoolSettings(new URI(url),
+                                                       proxyParamsOpt)
+  }
+
+  protected def processEvent(
+      subscriptionId: String,
+      event: NostrEvent): Future[Unit]
+
+  protected def processNotice(notice: String): Future[Unit]
+
+  def publishEvent(event: NostrEvent): Future[QueueOfferResult] = {
+    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+    val json = Json.toJson(event)
+    val message = JsArray(Seq(JsString("EVENT"), json))
+    queue.offer(TextMessage(message.toString))
+  }
+
+  override def start(): Future[Unit] = {
+    require(subscriptionQueue.isEmpty, "Already started")
+
+    val sink = Sink.foreachAsync[Message](5) {
+      case TextMessage.Strict(text) =>
+        val jsArray = Try {
+          Json.parse(text).as[JsArray].value.toVector
+        }.getOrElse {
+          throw new RuntimeException(s"Could not parse json: $text")
+        }
+
+        if (jsArray.nonEmpty) {
+          val headStr = jsArray.head.as[String].toLowerCase
+          val remaining = jsArray.tail
+
+          headStr match {
+            case "notice" =>
+              val notice = remaining.head.as[String]
+              processNotice(notice)
+            case "event" =>
+              val subscriptionId = remaining.head.as[String]
+              val event = remaining.tail.head.as[NostrEvent]
+              processEvent(subscriptionId, event)
+            case str =>
+              Future.failed(new RuntimeException(s"Unknown message type: $str"))
+          }
+        } else {
+          logger.warn(s"Received empty json array: $text")
+          Future.unit
+        }
+      case streamed: TextMessage.Streamed =>
+        streamed.textStream.runWith(Sink.ignore)
+        Future.unit
+      case bm: BinaryMessage =>
+        bm.dataStream.runWith(Sink.ignore)
+        logger.warn("Received unexpected message")
+        Future.unit
+    }
+
+    val shutdownP = Promise[Unit]()
+
+    val flow = Flow.fromSinkAndSourceMat(sink, source)(Keep.left)
+    val wsFlow = flow.watchTermination() { (_, termination) =>
+      termination.onComplete { _ =>
+        shutdownP.success(())
+      }
+    }
+
+    val httpConnectionPoolSettings = createHttpConnectionPoolSettings()
+
+    val (upgradeResponse, _) =
+      http.singleWebSocketRequest(
+        WebSocketRequest(url),
+        wsFlow,
+        settings = httpConnectionPoolSettings.connectionSettings)
+    subscriptionQueue = Some((queue, shutdownP))
+
+    upgradeResponse.map {
+      case _: ValidUpgrade => ()
+      case InvalidUpgradeResponse(response, cause) =>
+        throw new RuntimeException(
+          s"Connection failed ${response.status}: $cause")
+    }
+  }
+
+  override def stop(): Future[Unit] = {
+    subscriptionQueue match {
+      case Some((queue, closedP)) =>
+        queue.complete()
+        subscriptionQueue = None
+        closedP.future
+      case None => Future.unit
+    }
+  }
+}

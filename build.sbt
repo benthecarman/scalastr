@@ -25,10 +25,22 @@ lazy val scalastr = project
     publish / skip := true
   )
 
+lazy val core = project
+  .in(file("core"))
+  .settings(CommonSettings.settings: _*)
+  .settings(name := "core", libraryDependencies ++= Deps.core)
+
+lazy val coreTest = project
+  .in(file("core-test"))
+  .settings(CommonSettings.settings: _*)
+  .settings(name := "core-test", libraryDependencies ++= Deps.coreTest)
+  .dependsOn(core)
+
 lazy val client = project
   .in(file("client"))
   .settings(CommonSettings.settings: _*)
   .settings(name := "client", libraryDependencies ++= Deps.client)
+  .dependsOn(core)
 
 lazy val clientTest = project
   .in(file("client-test"))
