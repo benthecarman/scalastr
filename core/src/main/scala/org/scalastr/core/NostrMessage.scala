@@ -77,14 +77,14 @@ object NostrEvent {
 }
 
 case class NostrFilter(
-    ids: Vector[Sha256Digest],
-    authors: Vector[SchnorrPublicKey],
-    kinds: Vector[Int],
-    `#e`: Vector[Sha256Digest],
-    `#p`: Vector[SchnorrPublicKey],
-    since: Long,
-    until: Long,
-    limit: Int
+    ids: Option[Vector[Sha256Digest]],
+    authors: Option[Vector[SchnorrPublicKey]],
+    kinds: Option[Vector[Int]],
+    `#e`: Option[Vector[Sha256Digest]],
+    `#p`: Option[Vector[SchnorrPublicKey]],
+    since: Option[Long],
+    until: Option[Long],
+    limit: Option[Int]
 ) extends NostrMessage
 
 object NostrFilter {

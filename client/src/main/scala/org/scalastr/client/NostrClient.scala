@@ -4,12 +4,12 @@ import akka.actor.ActorSystem
 import akka.http.scaladsl.Http
 import akka.http.scaladsl.model.ws._
 import akka.http.scaladsl.settings._
-import akka.stream.{OverflowStrategy, QueueOfferResult}
+import akka.stream.OverflowStrategy
 import akka.stream.scaladsl._
 import grizzled.slf4j.Logging
 import org.bitcoins.core.util.StartStopAsync
 import org.bitcoins.tor.{Socks5ClientTransport, Socks5ProxyParams}
-import org.scalastr.core.NostrEvent
+import org.scalastr.core._
 import play.api.libs.json._
 
 import java.net.URI
@@ -46,11 +46,28 @@ abstract class NostrClient(
 
   protected def processNotice(notice: String): Future[Unit]
 
-  def publishEvent(event: NostrEvent): Future[QueueOfferResult] = {
+  def publishEvent(event: NostrEvent): Future[Unit] = {
     require(subscriptionQueue.isDefined, "Need to start nostr client first")
     val json = Json.toJson(event)
     val message = JsArray(Seq(JsString("EVENT"), json))
-    queue.offer(TextMessage(message.toString))
+    queue.offer(TextMessage(message.toString)).map(_ => ())
+  }
+
+  def subscribe(filter: NostrFilter): Future[String] = {
+    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+
+    val id = java.util.UUID.randomUUID().toString
+
+    val json = Json.toJson(filter)
+    val message = JsArray(Seq(JsString("REQ"), JsString(id), json))
+    queue.offer(TextMessage(message.toString)).map(_ => id)
+  }
+
+  def unsubscribe(id: String): Future[Unit] = {
+    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+
+    val json = JsArray(Seq(JsString("CLOSE"), JsString(id)))
+    queue.offer(TextMessage(json.toString)).map(_ => ())
   }
 
   override def start(): Future[Unit] = {
@@ -65,14 +82,14 @@ abstract class NostrClient(
         }
 
         if (jsArray.nonEmpty) {
-          val headStr = jsArray.head.as[String].toLowerCase
+          val headStr = jsArray.head.as[String].toUpperCase
           val remaining = jsArray.tail
 
           headStr match {
-            case "notice" =>
+            case "NOTICE" =>
               val notice = remaining.head.as[String]
               processNotice(notice)
-            case "event" =>
+            case "EVENT" =>
               val subscriptionId = remaining.head.as[String]
               val event = remaining.tail.head.as[NostrEvent]
               processEvent(subscriptionId, event)

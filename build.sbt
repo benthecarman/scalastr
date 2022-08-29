@@ -10,11 +10,15 @@ ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 lazy val scalastr = project
   .in(file("."))
   .aggregate(
+    core,
+    coreTest,
     client,
     clientTest,
     testkit
   )
   .dependsOn(
+    core,
+    coreTest,
     client,
     clientTest,
     testkit
@@ -32,7 +36,7 @@ lazy val core = project
 
 lazy val coreTest = project
   .in(file("core-test"))
-  .settings(CommonSettings.settings: _*)
+  .settings(CommonSettings.testSettings: _*)
   .settings(name := "core-test", libraryDependencies ++= Deps.coreTest)
   .dependsOn(core)
 
