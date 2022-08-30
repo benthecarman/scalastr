@@ -32,8 +32,8 @@ abstract class NostrClient(
     .toMat(BroadcastHub.sink)(Keep.both)
     .run()
 
-  private var subscriptionQueue: Option[
-    (SourceQueueWithComplete[Message], Promise[Unit])] = None
+  private var subscriptionQueue: Option[(SourceQueueWithComplete[Message],
+                                         Promise[Unit])] = None
 
   private def createHttpConnectionPoolSettings(): ConnectionPoolSettings = {
     Socks5ClientTransport.createConnectionPoolSettings(new URI(url),
