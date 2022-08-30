@@ -12,7 +12,7 @@ addSbtPlugin("com.github.sbt" % "sbt-ci-release" % "1.5.10")
 
 addSbtPlugin("net.bzzt" % "sbt-reproducible-builds" % "0.30")
 
-addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.5")
+addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.6")
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.8")
 
