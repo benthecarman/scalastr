@@ -2,31 +2,34 @@ package org.scalastr.client
 
 import org.bitcoins.core.util.TimeUtil
 import org.bitcoins.crypto._
-import org.bitcoins.testkit.util.BitcoinSAsyncTest
 import org.scalastr.core._
+import org.scalastr.testkit.EmbeddedRelay
 import play.api.libs.json._
 
 import scala.concurrent._
 import scala.concurrent.duration.DurationInt
 
-class NostrClientTest extends BitcoinSAsyncTest {
+class NostrClientTest extends EmbeddedRelay {
 
-  val privateKey: ECPrivateKey = ECPrivateKey.freshPrivateKey
-  private val eventPromise = Promise[NostrEvent]()
+  it must "publish an event and get the subscription" in { container =>
+    val privateKey: ECPrivateKey = ECPrivateKey.freshPrivateKey
+    val eventPromise = Promise[NostrEvent]()
 
-  val client: NostrClient = new NostrClient("ws://localhost:7000", None) {
+    val url =
+      s"ws://${container.containerIpAddress}:${container.mappedPort(8080)}"
 
-    override def processEvent(
-        subscriptionId: String,
-        event: NostrEvent): Future[Unit] = {
-      eventPromise.success(event)
-      Future.unit
+    val client: NostrClient = new NostrClient(url, None) {
+
+      override def processEvent(
+          subscriptionId: String,
+          event: NostrEvent): Future[Unit] = {
+        eventPromise.success(event)
+        Future.unit
+      }
+
+      override def processNotice(notice: String): Future[Unit] = Future.unit
     }
 
-    override def processNotice(notice: String): Future[Unit] = Future.unit
-  }
-
-  it must "publish an event and get the subscription" in {
     val event = NostrEvent.build(privateKey = privateKey,
                                  created_at = TimeUtil.currentEpochSecond,
                                  kind = 1,

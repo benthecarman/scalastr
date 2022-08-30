@@ -9,6 +9,8 @@ object Deps {
 
     val bitcoinsV = "1.9.2-195-2cae3f80-SNAPSHOT"
 
+    val testContainersV = "0.40.10"
+
     val grizzledSlf4jV = "1.3.4"
   }
 
@@ -46,6 +48,9 @@ object Deps {
 
     val bitcoinsDbCommons =
       "org.bitcoin-s" %% "bitcoin-s-db-commons" % V.bitcoinsV withSources () withJavadoc ()
+
+    val testContainers =
+      "com.dimafeng" %% "testcontainers-scala-scalatest" % V.testContainersV withSources () withJavadoc ()
   }
 
   val core: List[ModuleID] = List(
@@ -67,7 +72,10 @@ object Deps {
     Compile.akkaSlf4j
   )
 
-  val testkit: List[ModuleID] =
-    List(Compile.bitcoinsTestkit, Compile.grizzledSlf4j)
+  val testkit: List[ModuleID] = List(
+    Compile.bitcoinsTestkit,
+    Compile.grizzledSlf4j,
+    Compile.testContainers
+  )
 
 }
