@@ -11,7 +11,7 @@ import scala.concurrent.duration.DurationInt
 
 class NostrClientTest extends EmbeddedRelay {
 
-  it must "publish an event and get the subscription" in { container =>
+  it must "publish an event and get the subscription" in {
     val privateKey: ECPrivateKey = ECPrivateKey.freshPrivateKey
     val eventPromise = Promise[NostrEvent]()
 
