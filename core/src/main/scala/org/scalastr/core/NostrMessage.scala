@@ -2,9 +2,6 @@ package org.scalastr.core
 
 import org.bitcoins.crypto._
 import play.api.libs.json._
-import org.bitcoins.commons.serializers.JsonWriters._
-import org.bitcoins.commons.serializers.JsonReaders._
-import org.bitcoins.commons.serializers.JsonSerializers._
 
 sealed abstract class NostrMessage
 
@@ -27,7 +24,7 @@ case class NostrEvent(
   }
 }
 
-object NostrEvent {
+object NostrEvent extends SerializerUtil {
 
   implicit val nostrEventReads: Reads[NostrEvent] = Json.reads[NostrEvent]
 
@@ -87,7 +84,8 @@ case class NostrFilter(
     limit: Option[Int]
 ) extends NostrMessage
 
-object NostrFilter {
+object NostrFilter extends SerializerUtil {
+
   implicit val nostrFilterReads: Reads[NostrFilter] = Json.reads[NostrFilter]
 
   implicit val nostrFilterWrites: OWrites[NostrFilter] =
