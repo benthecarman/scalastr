@@ -7,7 +7,9 @@ object Deps {
     val akkaStreamV = "2.6.19"
     val akkaActorV: String = akkaStreamV
 
-    val bitcoinsV = "1.9.2-195-2cae3f80-SNAPSHOT"
+    val bitcoinsV = "1.9.3-14-9c112ac4-SNAPSHOT"
+
+    val playV = "2.9.3"
 
     val testContainersV = "0.40.10"
 
@@ -15,6 +17,9 @@ object Deps {
   }
 
   object Compile {
+
+    val playJson =
+      "com.typesafe.play" %% "play-json" % V.playV withSources () withJavadoc ()
 
     val akkaHttp =
       "com.typesafe.akka" %% "akka-http" % V.akkaV withSources () withJavadoc ()
@@ -31,9 +36,6 @@ object Deps {
     val grizzledSlf4j =
       "org.clapper" %% "grizzled-slf4j" % V.grizzledSlf4jV withSources () withJavadoc ()
 
-    val bitcoinsKeyManager =
-      "org.bitcoin-s" %% "bitcoin-s-key-manager" % V.bitcoinsV withSources () withJavadoc ()
-
     val bitcoinsTor =
       "org.bitcoin-s" %% "bitcoin-s-tor" % V.bitcoinsV withSources () withJavadoc ()
 
@@ -43,18 +45,16 @@ object Deps {
     val bitcoinsTestkit =
       "org.bitcoin-s" %% "bitcoin-s-testkit" % V.bitcoinsV withSources () withJavadoc ()
 
-    val bitcoinsAppCommons =
-      "org.bitcoin-s" %% "bitcoin-s-app-commons" % V.bitcoinsV withSources () withJavadoc ()
-
-    val bitcoinsDbCommons =
-      "org.bitcoin-s" %% "bitcoin-s-db-commons" % V.bitcoinsV withSources () withJavadoc ()
+    val bitcoinsCrypto =
+      "org.bitcoin-s" %% "bitcoin-s-crypto" % V.bitcoinsV withSources () withJavadoc ()
 
     val testContainers =
       "com.dimafeng" %% "testcontainers-scala-scalatest" % V.testContainersV withSources () withJavadoc ()
   }
 
   val core: List[ModuleID] = List(
-    Compile.bitcoinsAppCommons
+    Compile.playJson,
+    Compile.bitcoinsCrypto
   )
 
   val coreTest: List[ModuleID] = List(
@@ -62,9 +62,6 @@ object Deps {
   )
 
   val client: List[ModuleID] = List(
-    Compile.bitcoinsKeyManager,
-    Compile.bitcoinsAppCommons,
-    Compile.bitcoinsDbCommons,
     Compile.bitcoinsTor,
     Compile.akkaActor,
     Compile.akkaHttp,
