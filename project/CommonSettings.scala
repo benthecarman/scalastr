@@ -38,7 +38,7 @@ object CommonSettings {
       s == "-Ywarn-unused-import"
         || s == "-Ywarn-unused"
         || s == "-Xfatal-warnings"
-        //for 2.13 -- they use different compiler opts
+        // for 2.13 -- they use different compiler opts
         || s == "-Xlint:unused")),
     Test / console / scalacOptions ++= (Compile / console / scalacOptions).value,
     Test / scalacOptions ++= testCompilerOpts(scalaVersion.value),
@@ -49,7 +49,7 @@ object CommonSettings {
 
   private val commonCompilerOpts = {
     List(
-      //https://stackoverflow.com/a/43103038/967713
+      // https://stackoverflow.com/a/43103038/967713
       "-release",
       "8"
     )
@@ -103,14 +103,14 @@ object CommonSettings {
 
   def testCompilerOpts(scalaVersion: String): Seq[String] = {
     (commonCompilerOpts ++
-      //initialization checks: https://docs.scala-lang.org/tutorials/FAQ/initialization-order.html
+      // initialization checks: https://docs.scala-lang.org/tutorials/FAQ/initialization-order.html
       Vector("-Xcheckinit") ++
       compilerOpts(scalaVersion))
       .filterNot(_ == "-Xfatal-warnings")
   }
 
   lazy val testSettings: Seq[Setting[_]] = Seq(
-    //show full stack trace (-oF) of failed tests and duration of tests (-oD)
+    // show full stack trace (-oF) of failed tests and duration of tests (-oD)
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oDF"),
     Test / logBuffered := false,
     skip / publish := true
