@@ -11,7 +11,7 @@ object Deps {
 
     val playV = "2.9.3"
 
-    val testContainersV = "0.40.11"
+    val testContainersV = "0.40.12"
 
     val grizzledSlf4jV = "1.3.4"
   }
