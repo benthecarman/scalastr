@@ -9,7 +9,7 @@ case class NostrEvent(
     id: Sha256Digest,
     pubkey: SchnorrPublicKey,
     created_at: Long,
-    kind: Int,
+    kind: NostrKind,
     tags: JsArray,
     content: String,
     sig: SchnorrDigitalSignature)
@@ -49,18 +49,19 @@ object NostrEvent extends SerializerUtil {
   def createPayload(
       pubkey: SchnorrPublicKey,
       created_at: Long,
-      kind: Int,
+      kind: NostrKind,
       tags: JsArray,
       content: String): String = {
     val updatedTags = removeJsNulls(tags)
-    val array = Json.arr(0, pubkey.hex, created_at, kind, updatedTags, content)
+    val array =
+      Json.arr(0, pubkey.hex, created_at, kind.int, updatedTags, content)
     array.toString()
   }
 
   def build(
       privateKey: ECPrivateKey,
       created_at: Long,
-      kind: Int,
+      kind: NostrKind,
       tags: JsArray,
       content: String): NostrEvent = {
     val pubkey = privateKey.schnorrPublicKey

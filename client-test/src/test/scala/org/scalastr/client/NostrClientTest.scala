@@ -32,7 +32,7 @@ class NostrClientTest extends EmbeddedRelay {
 
     val event = NostrEvent.build(privateKey = privateKey,
                                  created_at = TimeUtil.currentEpochSecond,
-                                 kind = 1,
+                                 kind = NostrKind.TextNote,
                                  tags = JsArray.empty,
                                  content = "test")
 
