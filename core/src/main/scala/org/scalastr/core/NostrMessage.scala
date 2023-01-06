@@ -46,7 +46,7 @@ object NostrEvent extends SerializerUtil {
     case other => other
   }
 
-  def createPayload(
+  private def createPayload(
       pubkey: SchnorrPublicKey,
       created_at: Long,
       kind: NostrKind,
@@ -71,6 +71,18 @@ object NostrEvent extends SerializerUtil {
     val sig = privateKey.schnorrSign(id.bytes)
 
     NostrEvent(id, pubkey, created_at, kind, tags, content, sig)
+  }
+
+  def build(
+      privateKey: ECPrivateKey,
+      created_at: Long,
+      tags: JsArray,
+      metadata: Metadata): NostrEvent = {
+    build(privateKey,
+          created_at,
+          NostrKind.Metadata,
+          tags,
+          Json.toJson(metadata).toString)
   }
 }
 
