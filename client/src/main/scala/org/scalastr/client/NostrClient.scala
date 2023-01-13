@@ -92,9 +92,16 @@ abstract class NostrClient(
             case "EVENT" =>
               val subscriptionId = remaining.head.as[String]
               val event = remaining.tail.head.as[NostrEvent]
-              processEvent(subscriptionId, event)
+              if (event.verify)
+                processEvent(subscriptionId, event)
+              else {
+                logger.warn(s"Invalid signature for event: ${event.id.hex}")
+                Future.unit
+              }
+            case "OK" => Future.unit
             case str =>
-              Future.failed(new RuntimeException(s"Unknown message type: $str"))
+              logger.warn(s"Unknown message type: $str")
+              Future.unit
           }
         } else {
           logger.warn(s"Received empty json array: $text")

@@ -1,6 +1,6 @@
 package org.scalastr.client
 
-import org.bitcoins.core.util.TimeUtil
+import org.bitcoins.core.util.{EnvUtil, TimeUtil}
 import org.bitcoins.crypto._
 import org.scalastr.core._
 import org.scalastr.testkit.EmbeddedRelay
@@ -8,9 +8,11 @@ import play.api.libs.json._
 
 import java.net.URL
 import scala.concurrent._
-import scala.concurrent.duration.DurationInt
+import scala.concurrent.duration.{DurationInt, FiniteDuration}
 
 class NostrClientTest extends EmbeddedRelay {
+
+  val timeout: FiniteDuration = if (EnvUtil.isCI) 10.seconds else 3.seconds
 
   it must "publish an event and get the subscription" in {
     val privateKey: ECPrivateKey = ECPrivateKey.freshPrivateKey
@@ -37,7 +39,7 @@ class NostrClientTest extends EmbeddedRelay {
                                  tags = JsArray.empty,
                                  content = "test")
 
-    assert(event.verify())
+    assert(event.verify)
 
     val filter =
       NostrFilter(ids = None,
@@ -54,7 +56,7 @@ class NostrClientTest extends EmbeddedRelay {
       _ <- client.publishEvent(event)
       subscriptionId <- client.subscribe(filter)
 
-      subEvent = Await.result(eventPromise.future, 10.seconds)
+      subEvent = Await.result(eventPromise.future, timeout)
 
       _ <- client.unsubscribe(subscriptionId)
     } yield assert(event == subEvent)
@@ -94,7 +96,7 @@ class NostrClientTest extends EmbeddedRelay {
                                  tags = JsArray.empty,
                                  metadata = metadata)
 
-    assert(event.verify())
+    assert(event.verify)
 
     val filter =
       NostrFilter(ids = None,
@@ -111,7 +113,7 @@ class NostrClientTest extends EmbeddedRelay {
       _ <- client.publishEvent(event)
       subscriptionId <- client.subscribe(filter)
 
-      subEvent = Await.result(eventPromise.future, 10.seconds)
+      subEvent = Await.result(eventPromise.future, timeout)
 
       _ <- client.unsubscribe(subscriptionId)
     } yield assert(event == subEvent)

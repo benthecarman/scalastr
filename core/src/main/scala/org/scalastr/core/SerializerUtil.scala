@@ -107,6 +107,22 @@ trait SerializerUtil {
       extends Writes[SchnorrDigitalSignature] {
     override def writes(o: SchnorrDigitalSignature): JsValue = JsString(o.hex)
   }
+
+  def removeJsNulls[T <: JsValue](json: T): T = json match {
+    case JsObject(fields) =>
+      JsObject(fields.flatMap {
+        case (_, JsNull) => None
+        case (name, JsArray(arr)) =>
+          val noNulls = arr.map(removeJsNulls)
+          Some(name -> JsArray(noNulls))
+        case (name, value) =>
+          Some(name -> removeJsNulls(value))
+      }).asInstanceOf[T]
+    case JsArray(arr) =>
+      val noNulls = arr.map(removeJsNulls)
+      JsArray(noNulls).asInstanceOf[T]
+    case other => other
+  }
 }
 
 object SerializerUtil extends SerializerUtil
