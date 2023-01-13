@@ -123,7 +123,7 @@ object NostrEvent extends SerializerUtil {
 case class NostrFilter(
     ids: Option[Vector[Sha256Digest]],
     authors: Option[Vector[SchnorrPublicKey]],
-    kinds: Option[Vector[Int]],
+    kinds: Option[Vector[NostrKind]],
     `#e`: Option[Vector[Sha256Digest]],
     `#p`: Option[Vector[SchnorrPublicKey]],
     since: Option[Long],
