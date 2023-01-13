@@ -46,15 +46,17 @@ abstract class NostrClient(
 
   protected def processNotice(notice: String): Future[Unit]
 
+  def isStarted(): Boolean = subscriptionQueue.isDefined
+
   def publishEvent(event: NostrEvent): Future[Unit] = {
-    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+    require(isStarted(), "Need to start nostr client first")
     val json = Json.toJson(event)
     val message = JsArray(Seq(JsString("EVENT"), json))
     queue.offer(TextMessage(message.toString)).map(_ => ())
   }
 
   def subscribe(filter: NostrFilter): Future[String] = {
-    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+    require(isStarted(), "Need to start nostr client first")
 
     val id = java.util.UUID.randomUUID().toString
 
@@ -64,7 +66,7 @@ abstract class NostrClient(
   }
 
   def unsubscribe(id: String): Future[Unit] = {
-    require(subscriptionQueue.isDefined, "Need to start nostr client first")
+    require(isStarted(), "Need to start nostr client first")
 
     val json = JsArray(Seq(JsString("CLOSE"), JsString(id)))
     queue.offer(TextMessage(json.toString)).map(_ => ())
