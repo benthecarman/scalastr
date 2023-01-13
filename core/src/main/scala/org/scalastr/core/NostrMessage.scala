@@ -70,11 +70,12 @@ object NostrEvent extends SerializerUtil {
           Json.toJson(metadata).toString)
   }
 
-  private def getAesKey(
+  private[core] def getAesKey(
       privateKey: ECPrivateKey,
       publicKey: SchnorrPublicKey): AesKey = {
     val sharedPoint =
-      CryptoUtil.pubKeyTweakAdd(publicKey.publicKey, privateKey.schnorrKey)
+      CryptoUtil.tweakMultiply(publicKey.publicKey,
+                               privateKey.schnorrKey.fieldElement)
     AesKey.fromValidBytes(sharedPoint.bytes.tail)
   }
 
@@ -108,9 +109,9 @@ object NostrEvent extends SerializerUtil {
     val split = content.split("\\?iv=", 2)
     val cipherText = split.head
     val iv = split.last
-    val encrypted = AesEncryptedData(
-      ByteVector.fromBase64(cipherText).get,
-      AesIV.fromValidBytes(ByteVector.fromBase64(iv).get))
+    val ivBytes = ByteVector.fromValidBase64(iv)
+    val encrypted = AesEncryptedData(ByteVector.fromValidBase64(cipherText),
+                                     AesIV.fromValidBytes(ivBytes))
 
     AesCrypt.decrypt(encrypted, aesKey) match {
       case Left(err)    => throw err

@@ -17,8 +17,7 @@ object AesCrypt {
   private val aesCipherType: String = "AES/CBC/PKCS5Padding"
 
   private def getCipher: Cipher = {
-    val cipher = Cipher.getInstance(aesCipherType)
-    cipher
+    Cipher.getInstance(aesCipherType)
   }
 
   private def decryptionCipher(
@@ -75,10 +74,7 @@ object AesCrypt {
 
     val cipherText = cipher.doFinal(plainText.toArray)
 
-    val encrypted =
-      AesEncryptedData(cipherText = ByteVector(cipherText), iv = iv)
-    encrypted
-
+    AesEncryptedData(cipherText = ByteVector(cipherText), iv = iv)
   }
 
   /** Encrypts the given plaintext with the given key.

@@ -3,6 +3,7 @@ package org.scalastr.core
 import org.bitcoins.core.util.TimeUtil
 import org.bitcoins.crypto.ECPrivateKey
 import org.bitcoins.testkitcore.util.BitcoinSUnitTest
+import org.scalastr.core.NostrEvent.getAesKey
 import play.api.libs.json._
 
 class NostrMessageTest extends BitcoinSUnitTest {
@@ -31,5 +32,40 @@ class NostrMessageTest extends BitcoinSUnitTest {
 
     val decrypted = NostrEvent.decryptDM(dm, key2)
     assert(decrypted == message)
+  }
+
+  it must "pass encrypted dm unit test" in {
+    val key1 = ECPrivateKey(
+      "6b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e")
+    val key2 = ECPrivateKey(
+      "7b911fd37cdf5c81d4c0adb1ab7fa822ed253ab0ad9aa18d77257c88b29b718e")
+
+    val aesKey1 = getAesKey(key1, key2.schnorrPublicKey)
+    val aesKey2 = getAesKey(key2, key1.schnorrPublicKey)
+
+    assert(aesKey1 == aesKey2)
+
+    val message = "Saturn, bringer of old age"
+    val dm1 = NostrEvent.encryptedDM(message,
+                                     key1,
+                                     TimeUtil.currentEpochSecond,
+                                     JsArray.empty,
+                                     key2.schnorrPublicKey)
+    assert(dm1.verify)
+
+    val encrypted =
+      "dJc+WbBgaFCD2/kfg1XCWJParplBDxnZIdJGZ6FCTOg=?iv=M6VxRPkMZu7aIdD+10xPuw=="
+    val dm2 =
+      NostrEvent.build(key1,
+                       TimeUtil.currentEpochSecond,
+                       NostrKind.EncryptedDM,
+                       Json.arr(Json.arr("p", key2.schnorrPublicKey.hex)),
+                       encrypted)
+
+    val decrypted = NostrEvent.decryptDM(dm1, key2)
+    assert(decrypted == message)
+
+    val decrypted2 = NostrEvent.decryptDM(dm2, key2)
+    assert(decrypted2 == message)
   }
 }
