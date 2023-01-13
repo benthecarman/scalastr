@@ -15,13 +15,12 @@ case class NostrEvent(
     sig: SchnorrDigitalSignature)
     extends NostrMessage {
 
-  val payload: String =
+  private lazy val payload: String =
     NostrEvent.createPayload(pubkey, created_at, kind, tags, content)
 
-  def verify(): Boolean = {
-    val hash = CryptoUtil.sha256(payload)
-    pubkey.verify(hash, sig)
-  }
+  private lazy val hash = CryptoUtil.sha256(payload)
+
+  lazy val verify: Boolean = hash == id && pubkey.verify(hash, sig)
 }
 
 object NostrEvent extends SerializerUtil {
@@ -29,22 +28,6 @@ object NostrEvent extends SerializerUtil {
   implicit val nostrEventReads: Reads[NostrEvent] = Json.reads[NostrEvent]
 
   implicit val nostrEventWrites: OWrites[NostrEvent] = Json.writes[NostrEvent]
-
-  def removeJsNulls[T <: JsValue](json: T): T = json match {
-    case JsObject(fields) =>
-      JsObject(fields.flatMap {
-        case (_, JsNull) => None
-        case (name, JsArray(arr)) =>
-          val noNulls = arr.map(removeJsNulls)
-          Some(name -> JsArray(noNulls))
-        case (name, value) =>
-          Some(name -> removeJsNulls(value))
-      }).asInstanceOf[T]
-    case JsArray(arr) =>
-      val noNulls = arr.map(removeJsNulls)
-      JsArray(noNulls).asInstanceOf[T]
-    case other => other
-  }
 
   private def createPayload(
       pubkey: SchnorrPublicKey,

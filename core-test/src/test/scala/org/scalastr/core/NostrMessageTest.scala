@@ -12,6 +12,6 @@ class NostrMessageTest extends BitcoinSUnitTest {
     val event = Json.parse(json).as[NostrEvent]
     assert(
       event.id.hex == "2be17aa3031bdcb006f0fce80c146dea9c1c0268b0af2398bb673365c6444d45")
-    assert(event.verify())
+    assert(event.verify)
   }
 }
