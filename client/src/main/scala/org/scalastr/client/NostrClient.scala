@@ -17,7 +17,7 @@ import scala.concurrent._
 import scala.util._
 
 abstract class NostrClient(
-    url: String,
+    val url: String,
     proxyParamsOpt: Option[Socks5ProxyParams])(implicit val system: ActorSystem)
     extends StartStopAsync[Unit]
     with Logging {
