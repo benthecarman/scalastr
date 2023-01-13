@@ -1,7 +1,9 @@
 package org.scalastr.core
 
-import org.bitcoins.crypto._
+import org.bitcoins.crypto.{AesCrypt => _, _}
+import org.scalastr.core.crypto.AesCrypt
 import play.api.libs.json._
+import scodec.bits.ByteVector
 
 sealed abstract class NostrMessage
 
@@ -66,6 +68,54 @@ object NostrEvent extends SerializerUtil {
           NostrKind.Metadata,
           tags,
           Json.toJson(metadata).toString)
+  }
+
+  private def getAesKey(
+      privateKey: ECPrivateKey,
+      publicKey: SchnorrPublicKey): AesKey = {
+    val sharedPoint =
+      CryptoUtil.pubKeyTweakAdd(publicKey.publicKey, privateKey.schnorrKey)
+    AesKey.fromValidBytes(sharedPoint.bytes.tail)
+  }
+
+  def encryptedDM(
+      message: String,
+      privateKey: ECPrivateKey,
+      created_at: Long,
+      tags: JsArray,
+      recipient: SchnorrPublicKey): NostrEvent = {
+    val aesKey = getAesKey(privateKey, recipient)
+
+    val encrypted = AesCrypt.encrypt(ByteVector(message.getBytes), aesKey)
+    val content =
+      encrypted.cipherText.toBase64 + "?iv=" + encrypted.iv.bytes.toBase64
+
+    val pTag = Json.arr("p", recipient.hex)
+    val withP = if (tags.value.contains(pTag)) tags else tags :+ pTag
+    build(privateKey, created_at, NostrKind.EncryptedDM, withP, content)
+  }
+
+  def decryptDM(event: NostrEvent, privateKey: ECPrivateKey): String = {
+    require(event.kind == NostrKind.EncryptedDM, "Event must be encrypted DM")
+    require(
+      event.tags.value.contains(Json.arr("p", privateKey.schnorrPublicKey.hex)),
+      "Event must be encrypted DM for this user")
+    require(event.verify, "Event must be valid")
+
+    val aesKey = getAesKey(privateKey, event.pubkey)
+
+    val content = event.content
+    val split = content.split("\\?iv=", 2)
+    val cipherText = split.head
+    val iv = split.last
+    val encrypted = AesEncryptedData(
+      ByteVector.fromBase64(cipherText).get,
+      AesIV.fromValidBytes(ByteVector.fromBase64(iv).get))
+
+    AesCrypt.decrypt(encrypted, aesKey) match {
+      case Left(err)    => throw err
+      case Right(bytes) => bytes.decodeUtf8Lenient
+    }
   }
 }
 
