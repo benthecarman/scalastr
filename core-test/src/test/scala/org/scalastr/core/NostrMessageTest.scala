@@ -1,5 +1,7 @@
 package org.scalastr.core
 
+import org.bitcoins.core.util.TimeUtil
+import org.bitcoins.crypto.ECPrivateKey
 import org.bitcoins.testkitcore.util.BitcoinSUnitTest
 import play.api.libs.json._
 
@@ -13,5 +15,21 @@ class NostrMessageTest extends BitcoinSUnitTest {
     assert(
       event.id.hex == "2be17aa3031bdcb006f0fce80c146dea9c1c0268b0af2398bb673365c6444d45")
     assert(event.verify)
+  }
+
+  it must "encrypt and decrypt a DM" in {
+    val key1 = ECPrivateKey.freshPrivateKey
+    val key2 = ECPrivateKey.freshPrivateKey
+
+    val message = "hello world"
+    val dm = NostrEvent.encryptedDM(message,
+                                    key1,
+                                    TimeUtil.currentEpochSecond,
+                                    JsArray.empty,
+                                    key2.schnorrPublicKey)
+    assert(dm.verify)
+
+    val decrypted = NostrEvent.decryptDM(dm, key2)
+    assert(decrypted == message)
   }
 }
