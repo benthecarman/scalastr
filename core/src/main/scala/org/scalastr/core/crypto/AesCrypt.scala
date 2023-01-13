@@ -1,12 +1,6 @@
 package org.scalastr.core.crypto
 
-import org.bitcoins.crypto.{
-  AesDecryptionException,
-  AesEncryptedData,
-  AesException,
-  AesIV,
-  AesKey
-}
+import org.bitcoins.crypto._
 import scodec.bits.ByteVector
 
 import javax.crypto.{BadPaddingException, Cipher}
