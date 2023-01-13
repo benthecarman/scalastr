@@ -26,20 +26,35 @@ class NostrClientTest extends EmbeddedRelay {
       override def processEvent(
           subscriptionId: String,
           event: NostrEvent): Future[Unit] = {
-        eventPromise.success(event)
+        eventPromise.trySuccess(event)
         Future.unit
       }
 
       override def processNotice(notice: String): Future[Unit] = Future.unit
     }
 
-    val event = NostrEvent.build(privateKey = privateKey,
-                                 created_at = TimeUtil.currentEpochSecond,
-                                 kind = NostrKind.TextNote,
-                                 tags = JsArray.empty,
-                                 content = "test")
+    val event1 = NostrEvent.build(privateKey = privateKey,
+                                  created_at = TimeUtil.currentEpochSecond,
+                                  kind = NostrKind.TextNote,
+                                  tags = JsArray.empty,
+                                  content = "test")
+    assert(event1.verify)
 
-    assert(event.verify)
+    val event2 = NostrEvent.build(privateKey = privateKey,
+                                  created_at = TimeUtil.currentEpochSecond,
+                                  kind = NostrKind.TextNote,
+                                  tags = JsArray.empty,
+                                  content = "test2")
+    assert(event2.verify)
+
+    val event3 = NostrEvent.build(privateKey = privateKey,
+                                  created_at = TimeUtil.currentEpochSecond,
+                                  kind = NostrKind.TextNote,
+                                  tags = JsArray.empty,
+                                  content = "test3")
+    assert(event3.verify)
+
+    val events = Vector(event1, event2, event3)
 
     val filter =
       NostrFilter(ids = None,
@@ -53,13 +68,13 @@ class NostrClientTest extends EmbeddedRelay {
 
     for {
       _ <- client.start()
-      _ <- client.publishEvent(event)
+      _ <- Future.sequence(events.map(client.publishEvent))
       subscriptionId <- client.subscribe(filter)
 
       subEvent = Await.result(eventPromise.future, timeout)
 
       _ <- client.unsubscribe(subscriptionId)
-    } yield assert(event == subEvent)
+    } yield assert(events.contains(subEvent))
   }
 
   it must "publish a metadata event and retrieve it" in {
