@@ -103,6 +103,7 @@ class NostrClientTest extends EmbeddedRelay {
       Some("me@scalastr.org"),
       Some("me@scalastr.org"),
       Some(new URL("https://scalastr.org")),
+      Some(new URL("https://scalastr.org/assets/images/scalastr.png")),
       Some(new URL("https://scalastr.org/assets/images/scalastr.png"))
     )
 

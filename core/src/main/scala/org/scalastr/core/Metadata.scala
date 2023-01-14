@@ -11,6 +11,7 @@ case class Metadata private (
     nip05: Option[String],
     lud16: Option[String],
     website: Option[String],
+    banner: Option[String],
     picture: Option[String]
 )
 
@@ -25,6 +26,7 @@ object Metadata {
       nip05: Option[String] = None,
       lud16: Option[String] = None,
       website: Option[URL] = None,
+      banner: Option[URL] = None,
       picture: Option[URL] = None): Metadata = {
     Metadata(displayName,
              name,
@@ -32,6 +34,7 @@ object Metadata {
              nip05,
              lud16,
              website.map(_.toString),
+             banner.map(_.toString),
              picture.map(_.toString))
   }
 }
