@@ -114,7 +114,8 @@ abstract class NostrClient(
                 logger.warn(s"Invalid signature for event: ${event.id.hex}")
                 Future.unit
               }
-            case "OK" => Future.unit
+            case "OK"   => Future.unit
+            case "EOSE" => Future.unit
             case str =>
               logger.warn(s"Unknown message type: $str")
               Future.unit
