@@ -25,12 +25,23 @@ abstract class NostrClient(
 
   private val http = Http(system)
 
-  private lazy val (queue, source) = Source
+  private var (queue, source) = Source
     .queue[Message](bufferSize = 10,
                     OverflowStrategy.backpressure,
                     maxConcurrentOffers = 2)
     .toMat(BroadcastHub.sink)(Keep.both)
     .run()
+
+  private def setNewQueueAndSource(): Unit = {
+    val (newQueue, newSource) = Source
+      .queue[Message](bufferSize = 10,
+                      OverflowStrategy.backpressure,
+                      maxConcurrentOffers = 2)
+      .toMat(BroadcastHub.sink)(Keep.both)
+      .run()
+    queue = newQueue
+    source = newSource
+  }
 
   private var subscriptionQueue: Option[(SourceQueueWithComplete[Message],
                                          Promise[Unit])] = None
@@ -76,6 +87,7 @@ abstract class NostrClient(
 
   override def start(): Future[Unit] = {
     require(subscriptionQueue.isEmpty, "Already started")
+    setNewQueueAndSource()
 
     val sink = Sink.foreachAsync[Message](5) {
       case TextMessage.Strict(text) =>
@@ -126,6 +138,7 @@ abstract class NostrClient(
     val wsFlow = flow.watchTermination() { (_, termination) =>
       termination.onComplete { _ =>
         shutdownP.success(())
+        subscriptionQueue = None
       }
     }
 
