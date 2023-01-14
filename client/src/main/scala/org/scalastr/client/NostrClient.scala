@@ -48,6 +48,8 @@ abstract class NostrClient(
 
   def isStarted(): Boolean = subscriptionQueue.isDefined
 
+  def shutdownPOpt: Option[Promise[Unit]] = subscriptionQueue.map(_._2)
+
   def publishEvent(event: NostrEvent): Future[Unit] = {
     require(isStarted(), "Need to start nostr client first")
     val json = Json.toJson(event)
