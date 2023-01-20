@@ -48,13 +48,17 @@ object Deps {
     val bitcoinsCrypto =
       "org.bitcoin-s" %% "bitcoin-s-crypto" % V.bitcoinsV withSources () withJavadoc ()
 
+    val bitcoinsCore =
+      "org.bitcoin-s" %% "bitcoin-s-core" % V.bitcoinsV withSources () withJavadoc ()
+
     val testContainers =
       "com.dimafeng" %% "testcontainers-scala-scalatest" % V.testContainersV withSources () withJavadoc ()
   }
 
   val core: List[ModuleID] = List(
     Compile.playJson,
-    Compile.bitcoinsCrypto
+    Compile.bitcoinsCrypto,
+    Compile.bitcoinsCore
   )
 
   val coreTest: List[ModuleID] = List(
