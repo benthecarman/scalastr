@@ -10,6 +10,8 @@ import scala.util.{Failure, Success}
 
 case class NostrPrivateKey(key: ECPrivateKey) extends NetworkElement {
 
+  def publicKey: NostrPublicKey = NostrPublicKey(key.schnorrPublicKey)
+
   override def toString: String = {
     val uint8s = UInt8.toUInt8s(key.bytes)
     val encoded = Bech32.from8bitTo5bit(uint8s)
