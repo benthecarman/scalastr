@@ -3,53 +3,53 @@ package org.scalastr.core
 import org.bitcoins.core.number.UInt8
 import org.bitcoins.core.util.{Bech32, Bech32Encoding, NumberUtil}
 import org.bitcoins.crypto._
-import org.scalastr.core.NostrPublicKey.expandedHrp
+import org.scalastr.core.NostrNoteId.expandedHrp
 import scodec.bits.ByteVector
 
 import scala.util.{Failure, Success}
 
-case class NostrPublicKey(key: SchnorrPublicKey) extends NetworkElement {
+case class NostrNoteId(id: Sha256Digest) extends NetworkElement {
 
   override def toString: String = {
-    val uint8s = UInt8.toUInt8s(key.bytes)
+    val uint8s = UInt8.toUInt8s(id.bytes)
     val encoded = Bech32.from8bitTo5bit(uint8s)
     val checksum =
       Bech32.createChecksum(expandedHrp ++ encoded, Bech32Encoding.Bech32)
     val encoding = Bech32.encode5bitToString(encoded ++ checksum)
 
-    NostrPublicKey.hrp + Bech32.separator + encoding
+    NostrNoteId.hrp + Bech32.separator + encoding
   }
 
-  override def bytes: ByteVector = key.bytes
+  override def bytes: ByteVector = id.bytes
 }
 
-object NostrPublicKey
-    extends Factory[NostrPublicKey]
-    with StringFactory[NostrPublicKey] {
+object NostrNoteId
+    extends Factory[NostrNoteId]
+    with StringFactory[NostrNoteId] {
 
-  final val hrp = "npub"
+  final val hrp = "note"
 
   final val expandedHrp = Bech32.hrpExpand(hrp)
 
-  def fromString(str: String): NostrPublicKey = {
+  def fromString(str: String): NostrNoteId = {
     fromHexT(str).orElse {
       Bech32.splitToHrpAndData(str, Bech32Encoding.Bech32).map {
         case (hrp, data) =>
           require(hrp.equalsIgnoreCase(this.hrp),
-                  s"nostr public key must start with npub")
+                  s"nostr note id must start with note")
           val converted = NumberUtil.convertUInt5sToUInt8(data)
           val bytes = UInt8.toBytes(converted)
-          val key = SchnorrPublicKey(bytes)
-          NostrPublicKey(key)
+          val hash = Sha256Digest(bytes)
+          NostrNoteId(hash)
       }
     } match {
       case Success(key) => key
       case Failure(err) =>
         throw new IllegalArgumentException(
-          s"Could not parse $str as a NostrPublicKey, got: $err")
+          s"Could not parse $str as a NostrNoteId, got: $err")
     }
   }
 
-  override def fromBytes(bytes: ByteVector): NostrPublicKey = NostrPublicKey(
-    SchnorrPublicKey(bytes))
+  override def fromBytes(bytes: ByteVector): NostrNoteId = NostrNoteId(
+    Sha256Digest(bytes))
 }
