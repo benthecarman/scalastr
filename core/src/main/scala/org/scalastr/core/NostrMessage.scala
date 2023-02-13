@@ -70,11 +70,32 @@ object NostrEvent extends SerializerUtil {
   }
 
   def build(
+      privateKey: NostrPrivateKey,
+      created_at: Long,
+      kind: NostrKind,
+      tags: Vector[JsArray],
+      content: String): NostrEvent = {
+    build(privateKey.key, created_at, kind, tags, content)
+  }
+
+  def build(
       privateKey: ECPrivateKey,
       created_at: Long,
       tags: Vector[JsArray],
       metadata: Metadata): NostrEvent = {
     build(privateKey,
+          created_at,
+          NostrKind.Metadata,
+          tags,
+          Json.toJson(metadata).toString)
+  }
+
+  def build(
+      privateKey: NostrPrivateKey,
+      created_at: Long,
+      tags: Vector[JsArray],
+      metadata: Metadata): NostrEvent = {
+    build(privateKey.key,
           created_at,
           NostrKind.Metadata,
           tags,
