@@ -12,7 +12,7 @@ case class NostrEvent(
     pubkey: SchnorrPublicKey,
     created_at: Long,
     kind: NostrKind,
-    tags: JsArray,
+    tags: Vector[JsArray],
     content: String,
     sig: SchnorrDigitalSignature)
     extends NostrMessage {
@@ -21,6 +21,17 @@ case class NostrEvent(
     NostrEvent.createPayload(pubkey, created_at, kind, tags, content)
 
   private lazy val hash = CryptoUtil.sha256(payload)
+
+  def taggedRelays: Vector[String] = {
+    tags
+      .find(_.value.headOption.contains(JsString("relays")))
+      .map { jsArray =>
+        jsArray.value.collect { case JsString(str) =>
+          str
+        }.toVector
+      }
+      .getOrElse(Vector.empty)
+  }
 
   lazy val verify: Boolean = hash == id && pubkey.verify(hash, sig)
 }
@@ -35,9 +46,9 @@ object NostrEvent extends SerializerUtil {
       pubkey: SchnorrPublicKey,
       created_at: Long,
       kind: NostrKind,
-      tags: JsArray,
+      tags: Vector[JsArray],
       content: String): String = {
-    val updatedTags = removeJsNulls(tags)
+    val updatedTags = tags.map(removeJsNulls)
     val array =
       Json.arr(0, pubkey.hex, created_at, kind.int, updatedTags, content)
     array.toString()
@@ -47,7 +58,7 @@ object NostrEvent extends SerializerUtil {
       privateKey: ECPrivateKey,
       created_at: Long,
       kind: NostrKind,
-      tags: JsArray,
+      tags: Vector[JsArray],
       content: String): NostrEvent = {
     val pubkey = privateKey.schnorrPublicKey
     val payload = createPayload(pubkey, created_at, kind, tags, content)
@@ -61,7 +72,7 @@ object NostrEvent extends SerializerUtil {
   def build(
       privateKey: ECPrivateKey,
       created_at: Long,
-      tags: JsArray,
+      tags: Vector[JsArray],
       metadata: Metadata): NostrEvent = {
     build(privateKey,
           created_at,
@@ -83,7 +94,7 @@ object NostrEvent extends SerializerUtil {
       message: String,
       privateKey: ECPrivateKey,
       created_at: Long,
-      tags: JsArray,
+      tags: Vector[JsArray],
       recipient: SchnorrPublicKey): NostrEvent = {
     val aesKey = getAesKey(privateKey, recipient)
 
@@ -92,15 +103,14 @@ object NostrEvent extends SerializerUtil {
       encrypted.cipherText.toBase64 + "?iv=" + encrypted.iv.bytes.toBase64
 
     val pTag = Json.arr("p", recipient.hex)
-    val withP = if (tags.value.contains(pTag)) tags else tags :+ pTag
+    val withP = if (tags.contains(pTag)) tags else tags :+ pTag
     build(privateKey, created_at, NostrKind.EncryptedDM, withP, content)
   }
 
   def decryptDM(event: NostrEvent, privateKey: ECPrivateKey): String = {
     require(event.kind == NostrKind.EncryptedDM, "Event must be encrypted DM")
-    require(
-      event.tags.value.contains(Json.arr("p", privateKey.schnorrPublicKey.hex)),
-      "Event must be encrypted DM for this user")
+    require(event.tags.contains(Json.arr("p", privateKey.schnorrPublicKey.hex)),
+            "Event must be encrypted DM for this user")
     require(event.verify, "Event must be valid")
 
     val aesKey = getAesKey(privateKey, event.pubkey)
@@ -117,6 +127,14 @@ object NostrEvent extends SerializerUtil {
       case Left(err)    => throw err
       case Right(bytes) => bytes.decodeUtf8Lenient
     }
+  }
+
+  def isValidZapRequest(event: NostrEvent): Boolean = {
+    event.kind == NostrKind.ZapRequest &&
+    event.tags.exists(_.value.head.asOpt[String].contains("p")) &&
+    event.tags.count(_.value.head.asOpt[String].contains("e")) < 2 &&
+    event.taggedRelays.nonEmpty &&
+    event.verify
   }
 }
 

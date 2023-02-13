@@ -12,6 +12,8 @@ object NostrKind {
   case object EncryptedDM extends NostrKind(4)
   case object EventDeletion extends NostrKind(5)
   case object Reaction extends NostrKind(7)
+  case object ZapRequest extends NostrKind(9734)
+  case object Zap extends NostrKind(9735)
   case class Unknown(override val int: Int) extends NostrKind(int)
 
   val known: Vector[NostrKind] = Vector(Metadata,
@@ -20,7 +22,9 @@ object NostrKind {
                                         Contacts,
                                         EncryptedDM,
                                         EventDeletion,
-                                        Reaction)
+                                        Reaction,
+                                        ZapRequest,
+                                        Zap)
 
   def fromInt(int: Int): NostrKind = {
     known.find(_.int == int).getOrElse(Unknown(int))

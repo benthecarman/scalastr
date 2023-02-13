@@ -5,7 +5,6 @@ import org.bitcoins.crypto._
 import org.bitcoins.testkit.async.TestAsyncUtil
 import org.scalastr.core._
 import org.scalastr.testkit.EmbeddedRelay
-import play.api.libs.json._
 
 import java.net.URL
 import scala.collection.mutable
@@ -38,21 +37,21 @@ class NostrClientTest extends EmbeddedRelay {
     val event1 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test")
     assert(event1.verify)
 
     val event2 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test2")
     assert(event2.verify)
 
     val event3 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test3")
     assert(event3.verify)
 
@@ -111,7 +110,7 @@ class NostrClientTest extends EmbeddedRelay {
 
     val event = NostrEvent.build(privateKey = privateKey,
                                  created_at = TimeUtil.currentEpochSecond,
-                                 tags = JsArray.empty,
+                                 tags = Vector.empty,
                                  metadata = metadata)
 
     assert(event.verify)
@@ -159,21 +158,21 @@ class NostrClientTest extends EmbeddedRelay {
     val event1 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test")
     assert(event1.verify)
 
     val event2 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test2")
     assert(event2.verify)
 
     val event3 = NostrEvent.build(privateKey = privateKey,
                                   created_at = TimeUtil.currentEpochSecond,
                                   kind = NostrKind.TextNote,
-                                  tags = JsArray.empty,
+                                  tags = Vector.empty,
                                   content = "test3")
     assert(event3.verify)
 

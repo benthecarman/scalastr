@@ -26,7 +26,7 @@ class NostrMessageTest extends BitcoinSUnitTest {
     val dm = NostrEvent.encryptedDM(message,
                                     key1,
                                     TimeUtil.currentEpochSecond,
-                                    JsArray.empty,
+                                    Vector.empty,
                                     key2.schnorrPublicKey)
     assert(dm.verify)
 
@@ -49,7 +49,7 @@ class NostrMessageTest extends BitcoinSUnitTest {
     val dm1 = NostrEvent.encryptedDM(message,
                                      key1,
                                      TimeUtil.currentEpochSecond,
-                                     JsArray.empty,
+                                     Vector.empty,
                                      key2.schnorrPublicKey)
     assert(dm1.verify)
 
@@ -59,7 +59,7 @@ class NostrMessageTest extends BitcoinSUnitTest {
       NostrEvent.build(key1,
                        TimeUtil.currentEpochSecond,
                        NostrKind.EncryptedDM,
-                       Json.arr(Json.arr("p", key2.schnorrPublicKey.hex)),
+                       Vector(Json.arr("p", key2.schnorrPublicKey.hex)),
                        encrypted)
 
     val decrypted = NostrEvent.decryptDM(dm1, key2)
@@ -67,5 +67,17 @@ class NostrMessageTest extends BitcoinSUnitTest {
 
     val decrypted2 = NostrEvent.decryptDM(dm2, key2)
     assert(decrypted2 == message)
+  }
+
+  it must "validate a zap request" in {
+    val str =
+      "{\"pubkey\":\"32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245\",\"content\":\"\",\"id\":\"d9cc14d50fcb8c27539aacf776882942c1a11ea4472f8cdec1dea82fab66279d\",\"created_at\":1674164539,\"sig\":\"77127f636577e9029276be060332ea565deaf89ff215a494ccff16ae3f757065e2bc59b2e8c113dd407917a010b3abd36c8d7ad84c0e3ab7dab3a0b0caa9835d\",\"kind\":9734,\"tags\":[[\"e\",\"3624762a1274dd9636e0c552b53086d70bc88c165bc4dc0f9e836a1eaf86c3b8\"],[\"p\",\"32e1827635450ebb3c5a7d12c1f8e7b2b514439ac10a67eef3d9fd9c5c68e245\"],[\"relays\",\"wss://relay.damus.io\",\"wss://nostr-relay.wlvs.space\",\"wss://nostr.fmt.wiz.biz\",\"wss://relay.nostr.bg\",\"wss://nostr.oxtr.dev\",\"wss://nostr.v0l.io\",\"wss://brb.io\",\"wss://nostr.bitcoiner.social\",\"ws://monad.jb55.com:8080\",\"wss://relay.snort.social\"]]}"
+    val event = Json.parse(str).as[NostrEvent]
+    assert(event.verify)
+    assert(event.kind == NostrKind.ZapRequest)
+    assert(event.tags.exists(_.value.head.asOpt[String].contains("p")))
+    assert(event.tags.count(_.value.head.asOpt[String].contains("e")) < 2)
+    assert(event.taggedRelays.nonEmpty)
+    assert(NostrEvent.isValidZapRequest(event))
   }
 }
