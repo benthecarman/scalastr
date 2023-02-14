@@ -26,7 +26,7 @@ case class NostrEvent(
     tags
       .find(_.value.headOption.contains(JsString("relays")))
       .map { jsArray =>
-        jsArray.value.collect { case JsString(str) =>
+        jsArray.value.tail.collect { case JsString(str) =>
           str
         }.toVector
       }
