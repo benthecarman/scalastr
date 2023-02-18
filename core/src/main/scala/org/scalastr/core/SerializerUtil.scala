@@ -94,6 +94,13 @@ trait SerializerUtil {
         NostrPublicKey.fromStringOpt)(json)
   }
 
+  implicit object NostrPrivateKeyReads extends Reads[NostrPrivateKey] {
+
+    override def reads(json: JsValue): JsResult[NostrPrivateKey] =
+      SerializerUtil.processJsStringOpt[NostrPrivateKey](
+        NostrPrivateKey.fromStringOpt)(json)
+  }
+
   implicit object SchnorrDigitalSignatureReads
       extends Reads[SchnorrDigitalSignature] {
 
@@ -108,6 +115,10 @@ trait SerializerUtil {
 
   implicit object NostrPublicKeyWrites extends Writes[NostrPublicKey] {
     override def writes(o: NostrPublicKey): JsValue = JsString(o.toString)
+  }
+
+  implicit object NostrPrivateKeyWrites extends Writes[NostrPrivateKey] {
+    override def writes(o: NostrPrivateKey): JsValue = JsString(o.toString)
   }
 
   implicit object Sha256DigestWrites extends Writes[Sha256Digest] {
