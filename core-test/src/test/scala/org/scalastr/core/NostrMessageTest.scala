@@ -1,5 +1,6 @@
 package org.scalastr.core
 
+import org.bitcoins.core.protocol.ln.currency.MilliSatoshis
 import org.bitcoins.core.util.TimeUtil
 import org.bitcoins.crypto.ECPrivateKey
 import org.bitcoins.testkitcore.util.BitcoinSUnitTest
@@ -78,6 +79,6 @@ class NostrMessageTest extends BitcoinSUnitTest {
     assert(event.tags.exists(_.value.head.asOpt[String].contains("p")))
     assert(event.tags.count(_.value.head.asOpt[String].contains("e")) < 2)
     assert(event.taggedRelays.nonEmpty)
-    assert(NostrEvent.isValidZapRequest(event))
+    assert(NostrEvent.isValidZapRequest(event, MilliSatoshis.one))
   }
 }

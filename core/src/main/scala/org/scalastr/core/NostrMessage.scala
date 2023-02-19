@@ -1,5 +1,6 @@
 package org.scalastr.core
 
+import org.bitcoins.core.protocol.ln.currency.MilliSatoshis
 import org.bitcoins.crypto.{AesCrypt => _, _}
 import org.scalastr.core.crypto.AesCrypt
 import play.api.libs.json._
@@ -150,9 +151,13 @@ object NostrEvent extends SerializerUtil {
     }
   }
 
-  def isValidZapRequest(event: NostrEvent): Boolean = {
+  def isValidZapRequest(event: NostrEvent, amount: MilliSatoshis): Boolean = {
     event.kind == NostrKind.ZapRequest &&
     event.tags.exists(_.value.head.asOpt[String].contains("p")) &&
+    event.tags
+      .find(_.value.headOption.contains(JsString("amount")))
+      .forall(
+        _.value.lastOption.flatMap(_.asOpt[Long]).contains(amount.toLong)) &&
     event.tags.count(_.value.head.asOpt[String].contains("e")) < 2 &&
     event.taggedRelays.nonEmpty &&
     event.verify
