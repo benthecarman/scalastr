@@ -98,14 +98,15 @@ class NostrClientTest extends EmbeddedRelay {
     }
 
     val metadata = Metadata.create(
-      Some("scalastr"),
-      Some("scalastr"),
-      Some("scalastr is a scala nostr implementation"),
-      Some("me@scalastr.org"),
-      Some("me@scalastr.org"),
-      Some(new URL("https://scalastr.org")),
-      Some(new URL("https://scalastr.org/assets/images/scalastr.png")),
-      Some(new URL("https://scalastr.org/assets/images/scalastr.png"))
+      displayName = Some("scalastr"),
+      name = Some("scalastr"),
+      about = Some("scalastr is a scala nostr implementation"),
+      nip05 = Some("me@scalastr.org"),
+      lud06 = None,
+      lud16 = Some("me@scalastr.org"),
+      website = Some(new URL("https://scalastr.org")),
+      banner = Some(new URL("https://scalastr.org/assets/images/scalastr.png")),
+      picture = Some(new URL("https://scalastr.org/assets/images/scalastr.png"))
     )
 
     val event = NostrEvent.build(privateKey = privateKey,
