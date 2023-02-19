@@ -51,6 +51,8 @@ abstract class NostrClient(
                                                        proxyParamsOpt)
   }
 
+  def unsubOnEOSE: Boolean = false
+
   protected def processEvent(
       subscriptionId: String,
       event: NostrEvent): Future[Unit]
@@ -115,7 +117,7 @@ abstract class NostrClient(
                 Future.unit
               }
             case "OK"   => Future.unit
-            case "EOSE" => Future.unit
+            case "EOSE" => if (unsubOnEOSE) stop() else Future.unit
             case str =>
               logger.warn(s"Unknown message type: $str")
               Future.unit
