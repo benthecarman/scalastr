@@ -79,6 +79,6 @@ class NostrMessageTest extends BitcoinSUnitTest {
     assert(event.tags.exists(_.value.head.asOpt[String].contains("p")))
     assert(event.tags.count(_.value.head.asOpt[String].contains("e")) < 2)
     assert(event.taggedRelays.nonEmpty)
-    assert(NostrEvent.isValidZapRequest(event, MilliSatoshis.one))
+    assert(NostrEvent.isValidZapRequest(event, MilliSatoshis.one, None))
   }
 }

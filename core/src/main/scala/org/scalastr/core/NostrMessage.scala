@@ -151,13 +151,20 @@ object NostrEvent extends SerializerUtil {
     }
   }
 
-  def isValidZapRequest(event: NostrEvent, amount: MilliSatoshis): Boolean = {
+  def isValidZapRequest(
+      event: NostrEvent,
+      amount: MilliSatoshis,
+      userOpt: Option[String]): Boolean = {
     event.kind == NostrKind.ZapRequest &&
     event.tags.exists(_.value.head.asOpt[String].contains("p")) &&
     event.tags
       .find(_.value.headOption.contains(JsString("amount")))
       .forall(
         _.value.lastOption.flatMap(_.asOpt[Long]).contains(amount.toLong)) &&
+    (userOpt.isEmpty || event.tags
+      .find(_.value.headOption.contains(JsString("user")))
+      .forall(
+        _.value.lastOption.flatMap(_.asOpt[String]).contains(userOpt.get))) &&
     event.tags.count(_.value.head.asOpt[String].contains("e")) < 2 &&
     event.taggedRelays.nonEmpty &&
     event.verify
