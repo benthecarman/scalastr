@@ -1,9 +1,3 @@
-enablePlugins(ReproducibleBuildsPlugin,
-              JavaAppPackaging,
-              GraalVMNativeImagePlugin,
-              DockerPlugin,
-              WindowsPlugin)
-
 ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
 ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 

@@ -1,7 +1,6 @@
 import com.typesafe.sbt.packager.Keys.maintainer
 import sbt.Keys._
 import sbt._
-import sbtassembly.AssemblyKeys.assembly
 import xerial.sbt.Sonatype.autoImport._
 
 import java.nio.file._
@@ -43,7 +42,6 @@ object CommonSettings {
     Test / console / scalacOptions ++= (Compile / console / scalacOptions).value,
     Test / scalacOptions ++= testCompilerOpts(scalaVersion.value),
     licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
-    assembly / test := {},
     resolvers ++= Resolver.sonatypeOssRepos("snapshots")
   )
 
