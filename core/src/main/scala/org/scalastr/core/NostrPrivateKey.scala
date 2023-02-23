@@ -33,6 +33,9 @@ object NostrPrivateKey
 
   final val expandedHrp = Bech32.hrpExpand(hrp)
 
+  override def apply(string: String): NostrPrivateKey =
+    NostrPrivateKey.fromString(string)
+
   def fromString(str: String): NostrPrivateKey = {
     fromHexT(str).orElse {
       Bech32.splitToHrpAndData(str, Bech32Encoding.Bech32).map {

@@ -31,6 +31,9 @@ object NostrNoteId
 
   final val expandedHrp = Bech32.hrpExpand(hrp)
 
+  override def apply(string: String): NostrNoteId =
+    NostrNoteId.fromString(string)
+
   def fromString(str: String): NostrNoteId = {
     fromHexT(str).orElse {
       Bech32.splitToHrpAndData(str, Bech32Encoding.Bech32).map {
