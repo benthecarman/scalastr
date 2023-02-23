@@ -65,6 +65,18 @@ object Deps {
     Compile.bitcoinsTestkitCore
   )
 
+  val nip5: List[ModuleID] = List(
+    Compile.bitcoinsTor,
+    Compile.akkaActor,
+    Compile.akkaHttp,
+    Compile.akkaStream,
+    Compile.akkaSlf4j
+  )
+
+  val nip5Test: List[ModuleID] = List(
+    Compile.bitcoinsTestkit,
+  )
+
   val client: List[ModuleID] = List(
     Compile.bitcoinsTor,
     Compile.akkaActor,
