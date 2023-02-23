@@ -23,4 +23,4 @@ jobs:
             ~/.sbt
           key: ${{ runner.os }}-cache
       - name: Run Tests
-        run: sbt coreTest/test clientTest/test
+        run: sbt coreTest/test clientTest/test nip5Test/test

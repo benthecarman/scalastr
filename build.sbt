@@ -19,6 +19,8 @@ lazy val scalastr = project
   .dependsOn(
     core,
     coreTest,
+    nip5,
+    nip5Test,
     client,
     clientTest,
     testkit
@@ -39,6 +41,18 @@ lazy val coreTest = project
   .settings(CommonSettings.testSettings: _*)
   .settings(name := "core-test", libraryDependencies ++= Deps.coreTest)
   .dependsOn(core)
+
+lazy val nip5 = project
+  .in(file("nip5"))
+  .settings(CommonSettings.settings: _*)
+  .settings(name := "nip5", libraryDependencies ++= Deps.nip5)
+  .dependsOn(core)
+
+lazy val nip5Test = project
+  .in(file("nip5-test"))
+  .settings(CommonSettings.testSettings: _*)
+  .settings(name := "nip5-test", libraryDependencies ++= Deps.nip5Test)
+  .dependsOn(nip5)
 
 lazy val client = project
   .in(file("client"))
