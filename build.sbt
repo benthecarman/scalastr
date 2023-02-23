@@ -6,6 +6,8 @@ lazy val scalastr = project
   .aggregate(
     core,
     coreTest,
+    nip5,
+    nip5Test,
     client,
     clientTest,
     testkit
