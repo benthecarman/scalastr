@@ -74,7 +74,7 @@ object Deps {
   )
 
   val nip5Test: List[ModuleID] = List(
-    Compile.bitcoinsTestkit,
+    Compile.bitcoinsTestkit
   )
 
   val client: List[ModuleID] = List(
