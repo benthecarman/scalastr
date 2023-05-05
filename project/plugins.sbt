@@ -1,6 +1,6 @@
 // bundle up Scala applications into packaging formats such as Docker,
 // GraalVM native-image, executable JARs etc
-addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.18")
+addSbtPlugin("org.xerial.sbt" % "sbt-sonatype" % "3.9.20")
 
 addSbtPlugin("org.scalameta" % "sbt-scalafmt" % "2.4.6")
 
