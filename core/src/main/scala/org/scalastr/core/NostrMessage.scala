@@ -159,8 +159,9 @@ object NostrEvent extends SerializerUtil {
     event.tags.exists(_.value.head.asOpt[String].contains("p")) &&
     event.tags
       .find(_.value.headOption.contains(JsString("amount")))
-      .forall(
-        _.value.lastOption.flatMap(_.asOpt[Long]).contains(amount.toLong)) &&
+      .forall(_.value.lastOption
+        .flatMap(t => t.asOpt[Long].orElse(t.asOpt[String].map(_.toLong)))
+        .contains(amount.toLong)) &&
     (userOpt.isEmpty || event.tags
       .find(_.value.headOption.contains(JsString("user")))
       .forall(
