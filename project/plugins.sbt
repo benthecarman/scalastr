@@ -14,4 +14,4 @@ addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.2.1")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.4")
+addSbtPlugin("com.github.sbt" % "sbt-digest" % "2.0.0")
