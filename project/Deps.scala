@@ -9,7 +9,7 @@ object Deps {
 
     val bitcoinsV = "1.9.7-385-5885f4e9-SNAPSHOT"
 
-    val playV = "2.9.4"
+    val playV = "2.10.6"
 
     val testContainersV = "0.40.12"
 
