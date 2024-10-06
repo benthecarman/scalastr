@@ -10,7 +10,7 @@ addSbtPlugin("com.thesamet" % "sbt-protoc" % "1.0.6")
 
 addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.8.19")
 
-addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.2.1")
+addSbtPlugin("com.github.sbt" % "sbt-pgp" % "2.3.0")
 
 addSbtPlugin("com.typesafe.sbt" % "sbt-web" % "1.4.4")
 
