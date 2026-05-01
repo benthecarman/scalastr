@@ -3,11 +3,10 @@ import sbt._
 object Deps {
 
   object V {
-    val akkaV = "10.2.10"
-    val akkaStreamV = "2.6.20"
-    val akkaActorV: String = akkaStreamV
+    val pekkoHttpV = "1.0.1"
+    val pekkoV = "1.0.2"
 
-    val bitcoinsV = "1.9.7-412-195cfbd2-SNAPSHOT"
+    val bitcoinsV = "1.9.8"
 
     val playV = "2.9.4"
 
@@ -21,17 +20,17 @@ object Deps {
     val playJson =
       "com.typesafe.play" %% "play-json" % V.playV withSources () withJavadoc ()
 
-    val akkaHttp =
-      "com.typesafe.akka" %% "akka-http" % V.akkaV withSources () withJavadoc ()
+    val pekkoHttp =
+      "org.apache.pekko" %% "pekko-http" % V.pekkoHttpV withSources () withJavadoc ()
 
-    val akkaStream =
-      "com.typesafe.akka" %% "akka-stream" % V.akkaStreamV withSources () withJavadoc ()
+    val pekkoStream =
+      "org.apache.pekko" %% "pekko-stream" % V.pekkoV withSources () withJavadoc ()
 
-    val akkaActor =
-      "com.typesafe.akka" %% "akka-actor" % V.akkaStreamV withSources () withJavadoc ()
+    val pekkoActor =
+      "org.apache.pekko" %% "pekko-actor" % V.pekkoV withSources () withJavadoc ()
 
-    val akkaSlf4j =
-      "com.typesafe.akka" %% "akka-slf4j" % V.akkaStreamV withSources () withJavadoc ()
+    val pekkoSlf4j =
+      "org.apache.pekko" %% "pekko-slf4j" % V.pekkoV withSources () withJavadoc ()
 
     val grizzledSlf4j =
       "org.clapper" %% "grizzled-slf4j" % V.grizzledSlf4jV withSources () withJavadoc ()
@@ -67,10 +66,11 @@ object Deps {
 
   val nip5: List[ModuleID] = List(
     Compile.bitcoinsTor,
-    Compile.akkaActor,
-    Compile.akkaHttp,
-    Compile.akkaStream,
-    Compile.akkaSlf4j
+    Compile.pekkoActor,
+    Compile.pekkoHttp,
+    Compile.pekkoStream,
+    Compile.pekkoSlf4j,
+    Compile.grizzledSlf4j
   )
 
   val nip5Test: List[ModuleID] = List(
@@ -79,10 +79,11 @@ object Deps {
 
   val client: List[ModuleID] = List(
     Compile.bitcoinsTor,
-    Compile.akkaActor,
-    Compile.akkaHttp,
-    Compile.akkaStream,
-    Compile.akkaSlf4j
+    Compile.pekkoActor,
+    Compile.pekkoHttp,
+    Compile.pekkoStream,
+    Compile.pekkoSlf4j,
+    Compile.grizzledSlf4j
   )
 
   val testkit: List[ModuleID] = List(
