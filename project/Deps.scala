@@ -4,7 +4,7 @@ object Deps {
 
   object V {
     val pekkoHttpV = "1.3.0"
-    val pekkoV = "1.6.0"
+    val pekkoV = "1.4.0"
 
     val bitcoinsV = "1.9.12"
 
