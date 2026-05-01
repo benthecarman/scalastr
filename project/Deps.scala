@@ -3,8 +3,8 @@ import sbt._
 object Deps {
 
   object V {
-    val pekkoHttpV = "1.0.1"
-    val pekkoV = "1.0.2"
+    val pekkoHttpV = "1.3.0"
+    val pekkoV = "1.6.0"
 
     val bitcoinsV = "1.9.12"
 
