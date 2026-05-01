@@ -6,7 +6,7 @@ object Deps {
     val pekkoHttpV = "1.0.1"
     val pekkoV = "1.0.2"
 
-    val bitcoinsV = "1.9.11"
+    val bitcoinsV = "1.9.12"
 
     val playV = "2.9.4"
 
