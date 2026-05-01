@@ -25,7 +25,7 @@ ThisBuild / developers := List(
 ThisBuild / organization := "org.scalastr"
 
 ThisBuild / licenses := List(
-  "MIT" -> new URL("https://opensource.org/licenses/MIT"))
+  "MIT" -> url("https://opensource.org/licenses/MIT"))
 
 ThisBuild / homepage := Some(url("https://github.com/benthecarman/scalastr"))
 
@@ -48,6 +48,5 @@ ThisBuild / dynverSeparator := "-"
 //https://github.com/sbt/sbt/pull/5153
 //https://github.com/bitcoin-s/bitcoin-s/pull/2194
 Global / excludeLintKeys ++= Set(
-  com.typesafe.sbt.packager.Keys.maintainer,
   Keys.mainClass
 )
