@@ -24,7 +24,7 @@ ThisBuild / developers := List(
 ThisBuild / description := "A barebones scala nostr library"
 
 ThisBuild / licenses := List(
-  "MIT" -> new URL("https://opensource.org/licenses/MIT"))
+  "MIT" -> url("https://opensource.org/licenses/MIT"))
 ThisBuild / homepage := Some(url("https://github.com/benthecarman/scalastr/"))
 
 // Remove all additional repository other than Maven Central from POM

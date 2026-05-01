@@ -1,12 +1,12 @@
 package org.scalastr.nip5
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.{Http, HttpExt}
-import akka.http.scaladsl.client.RequestBuilding.Get
-import akka.http.scaladsl.model.HttpRequest
-import akka.util.ByteString
 import grizzled.slf4j.Logging
 import org.bitcoins.crypto.SchnorrPublicKey
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.{Http, HttpExt}
+import org.apache.pekko.http.scaladsl.client.RequestBuilding.Get
+import org.apache.pekko.http.scaladsl.model.HttpRequest
+import org.apache.pekko.util.ByteString
 import org.scalastr.core.NostrPublicKey
 import play.api.libs.json.Json
 

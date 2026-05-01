@@ -1,15 +1,15 @@
 package org.scalastr.client
 
-import akka.actor.ActorSystem
-import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.ws._
-import akka.http.scaladsl.settings._
-import akka.stream.OverflowStrategy
-import akka.stream.scaladsl._
 import grizzled.slf4j.Logging
 import org.bitcoins.core.api.tor.Socks5ProxyParams
 import org.bitcoins.core.util.StartStopAsync
 import org.bitcoins.tor.Socks5ClientTransport
+import org.apache.pekko.actor.ActorSystem
+import org.apache.pekko.http.scaladsl.Http
+import org.apache.pekko.http.scaladsl.model.ws._
+import org.apache.pekko.http.scaladsl.settings._
+import org.apache.pekko.stream.OverflowStrategy
+import org.apache.pekko.stream.scaladsl._
 import org.scalastr.core._
 import play.api.libs.json._
 
