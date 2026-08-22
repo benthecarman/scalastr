@@ -1,6 +1,5 @@
 import sbt.Keys._
 import sbt._
-import xerial.sbt.Sonatype.autoImport._
 
 import java.nio.file._
 import scala.util.Properties
@@ -9,24 +8,6 @@ object CommonSettings {
 
   lazy val settings: Vector[Setting[_]] = Vector(
     scalaVersion := (ThisBuild / scalaVersion).value,
-    organization := "org.scalastr",
-    homepage := Some(url("https://github.com/benthecarman/scalastr")),
-    developers := List(
-      Developer(
-        "benthecarman",
-        "Ben Carman",
-        "benthecarman@live.com",
-        url("https://twitter.com/benthecarman")
-      )
-    ),
-    publishTo := {
-      val nexus = "https://s01.oss.sonatype.org/"
-      if (isSnapshot.value)
-        Some("snapshots" at nexus + "content/repositories/snapshots")
-      else Some("releases" at nexus + "service/local/staging/deploy/maven2")
-    },
-    ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org",
-    ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local",
     Compile / scalacOptions ++= compilerOpts(scalaVersion = scalaVersion.value),
     Test / scalacOptions ++= testCompilerOpts(scalaVersion =
       scalaVersion.value),
@@ -38,8 +19,7 @@ object CommonSettings {
         || s == "-Xlint:unused")),
     Test / console / scalacOptions ++= (Compile / console / scalacOptions).value,
     Test / scalacOptions ++= testCompilerOpts(scalaVersion.value),
-    licenses += ("MIT", url("https://opensource.org/licenses/MIT")),
-    resolvers += "Sonatype OSS Snapshots" at "https://s01.oss.sonatype.org/content/repositories/snapshots"
+    resolvers += Resolver.sonatypeCentralSnapshots
   )
 
   private val commonCompilerOpts = {
@@ -108,7 +88,7 @@ object CommonSettings {
     // show full stack trace (-oF) of failed tests and duration of tests (-oD)
     Test / testOptions += Tests.Argument(TestFrameworks.ScalaTest, "-oDF"),
     Test / logBuffered := false,
-    skip / publish := true
+    publish / skip := true
   ) ++ settings
 
   lazy val prodSettings: Seq[Setting[_]] = settings

@@ -1,9 +1,7 @@
 import sbt.Keys.excludeLintKeys
-import xerial.sbt.Sonatype.GitHubHosting
 
 import scala.util.Properties
 
-val scala2_12 = "2.12.15"
 val scala2_13 = "2.13.18"
 
 ThisBuild / scmInfo := Some(
@@ -24,24 +22,26 @@ ThisBuild / developers := List(
 
 ThisBuild / organization := "org.scalastr"
 
+ThisBuild / organizationName := "scalastr"
+
+ThisBuild / organizationHomepage := Some(
+  url("https://github.com/benthecarman/scalastr"))
+
 ThisBuild / licenses := List(
   "MIT" -> url("https://opensource.org/licenses/MIT"))
 
 ThisBuild / homepage := Some(url("https://github.com/benthecarman/scalastr"))
 
-ThisBuild / sonatypeProfileName := "org.scalastr"
+ThisBuild / description := "A barebones Scala Nostr library"
 
-ThisBuild / sonatypeProjectHosting := Some(
-  GitHubHosting("benthecarman", "scalastr", "benthecarman@live.com"))
-
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-ThisBuild / sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
+// Maven Central POMs must not refer consumers to additional repositories.
+ThisBuild / pomIncludeRepository := { _ => false }
 
 ThisBuild / scalafmtOnCompile := !Properties.envOrNone("CI").contains("true")
 
 ThisBuild / scalaVersion := scala2_13
 
-ThisBuild / crossScalaVersions := List(scala2_13, scala2_12)
+ThisBuild / crossScalaVersions := List(scala2_13)
 
 ThisBuild / dynverSeparator := "-"
 

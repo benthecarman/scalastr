@@ -1,5 +1,3 @@
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-sonatypeRepository := "https://s01.oss.sonatype.org/service/local"
 ThisBuild / versionScheme := Some("early-semver")
 
 lazy val scalastr = project
